@@ -1,0 +1,3 @@
+[submodule "as_sftp"]
+	path = as_sftp
+	url = git@github.com:antonscheffer/as_sftp.git
