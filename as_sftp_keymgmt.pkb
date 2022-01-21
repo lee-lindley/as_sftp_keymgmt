@@ -10,12 +10,12 @@ CREATE OR REPLACE PACKAGE BODY as_sftp_keymgmt AS
     BEGIN
         SELECT key INTO v_clob
         FROM as_sftp_private_keys k
-        WHERE UPPER(k.host) = UPPER(i_host) AND UPPER(k.id) = UPPER(i_user)
+        WHERE host = i_host AND k.id = i_user
         ;
         RETURN v_clob;
     EXCEPTION
         WHEN NO_DATA_FOUND THEN
-            raise_application_error(-20713, 'no record found in table as_sftp_private_keys for host='||UPPER(i_host)||', id='||UPPER(i_user));
+            raise_application_error(-20713, 'no record found in table as_sftp_private_keys for host='||i_host||', id='||i_user);
     END ;
 
     PROCEDURE login(i_host VARCHAR2, i_user VARCHAR2, i_passphrase VARCHAR2 := NULL, i_log_level pls_integer := null)
@@ -24,6 +24,32 @@ CREATE OR REPLACE PACKAGE BODY as_sftp_keymgmt AS
     BEGIN
         as_sftp.login(i_log_level => i_log_level, i_user => i_user, i_priv_key => v_priv_key, i_passphrase => i_passphrase);
     END;
+
+    PROCEDURE insert_priv_key(i_host VARCHAR2, i_user VARCHAR2, i_key CLOB) 
+    IS
+    BEGIN
+        INSERT INTO as_sftp_private_keys(host, id, key) VALUES(i_host, i_user, i_key);
+        COMMIT;
+    END insert_priv_key;
+
+    PROCEDURE update_priv_key(i_host VARCHAR2, i_user VARCHAR2, i_key CLOB) 
+    IS
+    BEGIN
+        UPDATE as_sftp_private_keys
+            SET key = i_key
+            WHERE host = i_host AND id = i_user
+            ;
+        COMMIT;
+    END update_priv_key;
+
+    PROCEDURE delete_priv_key(i_host VARCHAR2, i_user VARCHAR2) 
+    IS
+    BEGIN
+        DELETE FROM as_sftp_private_keys
+            WHERE host = i_host AND id = i_user
+            ;
+        COMMIT;
+    END delete_priv_key;
 END as_sftp_keymgmt;
 /
 show errors

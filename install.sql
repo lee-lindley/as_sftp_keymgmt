@@ -13,8 +13,11 @@ SELECT :file_name FROM dual;
 prompt calling &&do_file
 @@&&do_file
 --
+whenever sqlerror continue
 prompt deploying table as_sftp_private_keys
 @@as_sftp_private_keys.sql
+prompt ok if table create fails because table already exists
+whenever sqlerror exit failure
 prompt deploying as_sftp_keymgmt.pks
 @@as_sftp_keymgmt.pks
 prompt deploying as_sftp_keymgmt.pkb
