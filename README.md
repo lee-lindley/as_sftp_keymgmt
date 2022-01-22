@@ -31,7 +31,7 @@ There are two *define* statements at the top of
 - compile_as_sftp if set to TRUE will cause *install.sql* to compile code in the cloned
 submodule directory *as_sftp*.
 - compile_keymgmt_security if set to TRUE will cause *install.sql* to compile the
-*as_sftp_keymgmt* package and associate it with Fine Grained Access Control on the
+*as_sftp_keymgmt_security* package and associate it with Fine Grained Access Control on the
 table *as_sftp_private_keys*.
 
 `sqlplus YourLoginConnectionString @install.sql`
