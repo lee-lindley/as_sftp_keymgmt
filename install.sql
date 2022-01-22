@@ -5,6 +5,18 @@ define compile_keymgmt_security="TRUE"
 COLUMN :file_name NEW_VALUE do_file NOPRINT
 VARIABLE file_name VARCHAR2(128)
 --
+-- get the current_schema name into a define named compile_schema. Reuse our :file_name/do_file combo for the purpose
+--
+BEGIN
+    :file_name := SYS_CONTEXT('USERENV','CURRENT_SCHEMA');
+END;
+/
+SELECT :file_name FROM dual;
+
+define compile_schema=&&do_file
+prompt compiling in schema &&compile_schema
+
+--
 BEGIN
     :file_name := CASE WHEN '&&compile_as_sftp' = 'TRUE' THEN 'install_as_sftp.sql' ELSE 'do_nothing.sql as_sftp' END;
 END;

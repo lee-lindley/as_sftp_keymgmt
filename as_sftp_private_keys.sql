@@ -1,3 +1,4 @@
+-- when security is enabled, only the as_sftp_keymgmt package methods can access or manipulate records in this table
 CREATE TABLE as_sftp_private_keys
 (
     host  VARCHAR2(1000) NOT NULL
