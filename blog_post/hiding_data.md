@@ -169,7 +169,7 @@ The package *as_sftp_keymgmt_security* must be
 both publicly executable and have a public synonym for this to work. If you do not have
 the privilege to create a public synonym, the DBA must do it for you. 
 
-You may also need the DBA to 'GRANT EXECUTE ON DBMS_RLF TO **your_schema**;', though it is common enough to grant
+You may also need the DBA to 'GRANT EXECUTE ON DBMS_RLS TO **your_schema**;', though it is common enough to grant
 it to 'PUBLIC'.
 
 Of note is that the *add_policy* for 'INSERT' uses an additional parameter because 'INSERT' statements do 
