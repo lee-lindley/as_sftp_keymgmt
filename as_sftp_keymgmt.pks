@@ -2,7 +2,13 @@ CREATE OR REPLACE PACKAGE as_sftp_keymgmt AS
     --
     -- Important! The private key lookup is case sensitive on i_host and i_user.
     --
-    PROCEDURE login(i_host VARCHAR2, i_user VARCHAR2, i_passphrase VARCHAR2 := NULL, i_log_level pls_integer := null);
+    PROCEDURE login(
+         i_user         VARCHAR2
+        ,i_host         VARCHAR2
+        ,i_trust_server BOOLEAN := FALSE
+        ,i_passphrase   VARCHAR2 := NULL
+        ,i_log_level    pls_integer := null
+    );
 -- comment out this function when done testing. It should not be public
     --FUNCTION get_priv_key(i_host VARCHAR2, i_user VARCHAR2) RETURN CLOB;
     --

@@ -21,10 +21,22 @@ CREATE OR REPLACE PACKAGE BODY as_sftp_keymgmt AS
     --
     -- The method for obtaining the private key and using it to call as_sftp.login
     --
-    PROCEDURE login(i_host VARCHAR2, i_user VARCHAR2, i_passphrase VARCHAR2 := NULL, i_log_level pls_integer := null)
+    PROCEDURE login(
+         i_user         VARCHAR2
+        ,i_host         VARCHAR2
+        ,i_trust_server BOOLEAN := FALSE
+        ,i_passphrase   VARCHAR2 := NULL
+        ,i_log_level    pls_integer := null
+    )
     IS
         v_priv_key VARCHAR2(32767) := get_priv_key(i_host, i_user);
     BEGIN
+        IF i_trust_server THEN
+            as_sftp.open_connection(i_host => i_host, i_trust_server => TRUE);
+            -- not sure required to close and reopen, but that is how Anton's example works
+            as_sftp.close_connection;
+        END IF;
+        as_sftp.open_connection(i_host => i_host);
         as_sftp.login(i_log_level => i_log_level, i_user => i_user, i_priv_key => v_priv_key, i_passphrase => i_passphrase);
     END;
 

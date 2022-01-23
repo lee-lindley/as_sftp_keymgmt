@@ -56,22 +56,23 @@ end;
 -- one time call to seed the server as trusted
 --
 begin
-as_sftp.open_connection(ihost => 'localhost', i_trust_server => TRUE);
+as_sftp.open_connection(i_host => 'localhost', i_trust_server => TRUE);
+as_sftp.close_connection;
 end;
 /
 
 --
 -- then mostly from Anton's example except for the call to login
+-- NOTE!!!! as_sftp_keymgmt.login does both open_connection and login!!!!!!!!!!!!!!!
 --
 set serveroutput on;
 declare
   l_file blob;
   l_dir_listing as_sftp.tp_dir_listing;
 begin
-  as_sftp.open_connection( i_host => 'localhost' );
 
   --
-  -- new functionality with keymgmt
+  -- new functionality with keymgmt. Opens connection and logs in with private key
   --
   as_sftp_keymgmt.login(i_log_level => 3, i_user => 'lee', i_host => 'localhost');
   --

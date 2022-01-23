@@ -15,6 +15,7 @@ SELECT :file_name FROM dual;
 
 define compile_schema=&&do_file
 prompt compiling in schema &&compile_schema
+prompt
 
 --
 BEGIN

@@ -110,7 +110,15 @@ CREATE OR REPLACE PACKAGE as_sftp_keymgmt AS
     --
     -- Important! The private key lookup is case sensitive on i_host and i_user.
     --
-    PROCEDURE login(i_host VARCHAR2, i_user VARCHAR2, i_passphrase VARCHAR2 := NULL, i_log_level pls_integer := null);
+    -- Does both open_connection and login with private key
+    --
+    PROCEDURE login(
+         i_user         VARCHAR2
+        ,i_host         VARCHAR2
+        ,i_trust_server BOOLEAN := FALSE
+        ,i_passphrase   VARCHAR2 := NULL
+        ,i_log_level    pls_integer := null
+    );
 -- comment out this function when done testing. It should not be public
     --FUNCTION get_priv_key(i_host VARCHAR2, i_user VARCHAR2) RETURN CLOB;
     --
@@ -127,7 +135,8 @@ END as_sftp_keymgmt;
 While testing I made the function *get_priv_key* public so that I could validate what it was doing.
 It should be private.
 
-The procuedure *login* will lookup the private key (using *get_priv_key*) and call *as_sftp.login* using it.
+The procuedure *login* will open the connection, lookup the private key (using *get_priv_key*),
+and call *as_sftp.login* using it.
 
 The three DML procedures allow operations on individual private key records for anyone granted execute
 on the package. As noted, it might be better to put those in a separate package.
@@ -421,10 +430,22 @@ CREATE OR REPLACE PACKAGE BODY as_sftp_keymgmt AS
     --
     -- The method for obtaining the private key and using it to call as_sftp.login
     --
-    PROCEDURE login(i_host VARCHAR2, i_user VARCHAR2, i_passphrase VARCHAR2 := NULL, i_log_level pls_integer := null)
+    PROCEDURE login(
+         i_user         VARCHAR2
+        ,i_host         VARCHAR2
+        ,i_trust_server BOOLEAN := FALSE
+        ,i_passphrase   VARCHAR2 := NULL
+        ,i_log_level    pls_integer := null
+    )
     IS
         v_priv_key VARCHAR2(32767) := get_priv_key(i_host, i_user);
     BEGIN
+        IF i_trust_server THEN
+            as_sftp.open_connection(i_host => i_host, i_trust_server => TRUE);
+            -- not sure required to close and reopen, but that is how Anton's example works
+            as_sftp.close_connection;
+        END IF;
+        as_sftp.open_connection(i_host => i_host);
         as_sftp.login(i_log_level => i_log_level, i_user => i_user, i_priv_key => v_priv_key, i_passphrase => i_passphrase);
     END;
 
@@ -460,9 +481,6 @@ END as_sftp_keymgmt;
 ```
 
 ## Conclusion
-
-The code will soon be a public repository on my github page at [as_sftp_keymgmt](https://github.com/lee-lindley/as_sftp_keymgmt).
-It is private at this moment as I haven't created the README. Should be up soon.
 
 I am not sure I enjoyed this exercise, but I learned enough about Oracle Fine Grained Access Control to accomplish
 my goal. Hope it was helpful.
